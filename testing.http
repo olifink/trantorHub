@@ -11,4 +11,7 @@ GET localhost:8080/token/validate
 Authorization: Bearer {{auth_token}}
 
 
-###
+### call something through middleware
+GET localhost:8080/profile
+Authorization: Bearer {{auth_token}}
+Accept: application/json

@@ -86,6 +86,16 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
+	tokenString, err := generateNewToken(username)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Could not generate token"})
+		return
+	}
+
+	c.JSON(200, gin.H{"token": tokenString})
+}
+
+func generateNewToken(username string) (string, error) {
 	// Set expiration time of the token
 	expirationTime := time.Now().Add(5 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
@@ -98,13 +108,7 @@ func loginHandler(c *gin.Context) {
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Could not generate token"})
-		return
-	}
-
-	c.JSON(200, gin.H{"token": tokenString})
+	return token.SignedString(jwtKey)
 }
 
 func registerHandler(c *gin.Context) {
@@ -120,28 +124,17 @@ func authMiddleware(c *gin.Context) {
 	c.Next()
 }
 
-func isValidToken(header string) bool {
-	return true
+func isValidToken(tknStr string) bool {
+	tkn, err := parseTokenString(tknStr)
+	return err == nil && tkn.Valid
 }
 
 func profileHandler(c *gin.Context) {
-	// TODO: Implement profileHandler
+	c.JSON(200, gin.H{"message": "Hello World!"})
 }
 
-func generateToken(c *gin.Context) {
-	// Set expiration time of the token
-	expirationTime := time.Now().Add(5 * time.Minute)
-	// Create the JWT claims, which includes the username and expiry time
-	claims := &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(expirationTime),
-		Issuer:    jwtIssuer,
-		Subject:   "someuser",
-	}
-
-	// Declare the token with the algorithm used for signing, and the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// Create the JWT string
-	tokenString, err := token.SignedString(jwtKey)
+func generateTokenHandler(c *gin.Context) {
+	tokenString, err := generateNewToken("example")
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Could not generate token"})
 		return
@@ -149,17 +142,10 @@ func generateToken(c *gin.Context) {
 	c.JSON(200, gin.H{"token": tokenString})
 }
 
-func validateToken(c *gin.Context) {
+func validateTokenHandler(c *gin.Context) {
 	// Parse the token
 	tknStr := c.GetHeader("Authorization")
-	tknStr = strings.TrimPrefix(tknStr, "Bearer ")
-	println(tknStr)
-
-	claims := &jwt.RegisteredClaims{}
-
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
+	tkn, err := parseTokenString(tknStr)
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrSignatureInvalid) {
@@ -177,6 +163,18 @@ func validateToken(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "Token is valid"})
 }
 
+func parseTokenString(tknStr string) (*jwt.Token, error) {
+	tknStr = strings.TrimPrefix(tknStr, "Bearer ")
+	println(tknStr)
+
+	claims := &jwt.RegisteredClaims{}
+
+	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+	return tkn, err
+}
+
 func main() {
 	r := gin.Default()
 
@@ -186,8 +184,8 @@ func main() {
 	r.GET("/profile", authMiddleware, profileHandler)
 
 	// Set up routes for token management
-	r.POST("/token/generate", generateToken)
-	r.GET("/token/validate", validateToken)
+	r.POST("/token/generate", generateTokenHandler)
+	r.GET("/token/validate", validateTokenHandler)
 
 	// Run the server
 	r.Run() // listens and serves on 0.0.0.0:8080 by default
