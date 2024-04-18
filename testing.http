@@ -1,4 +1,4 @@
-### Generate Token
+### Generate Token for testing
 
 POST localhost:8080/token/generate
 Accept: application/json
@@ -9,3 +9,6 @@ Accept: application/json
 
 GET localhost:8080/token/validate
 Authorization: {{auth_token}}
+
+
+###
