@@ -1,0 +1,11 @@
+### Generate Token
+
+POST localhost:8080/token/generate
+Accept: application/json
+
+> {% client.global.set("auth_token", response.body.token); %}
+
+### Validate Authorization
+
+GET localhost:8080/token/validate
+Authorization: {{auth_token}}
