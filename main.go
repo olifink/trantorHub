@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 )
 
@@ -151,6 +152,7 @@ func generateToken(c *gin.Context) {
 func validateToken(c *gin.Context) {
 	// Parse the token
 	tknStr := c.GetHeader("Authorization")
+	tknStr = strings.TrimPrefix(tknStr, "Bearer ")
 	println(tknStr)
 
 	claims := &jwt.RegisteredClaims{}

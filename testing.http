@@ -8,7 +8,7 @@ Accept: application/json
 ### Validate Authorization
 
 GET localhost:8080/token/validate
-Authorization: {{auth_token}}
+Authorization: Bearer {{auth_token}}
 
 
 ###
