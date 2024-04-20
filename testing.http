@@ -15,3 +15,9 @@ Authorization: Bearer {{auth_token}}
 GET localhost:8080/profile
 Authorization: Bearer {{auth_token}}
 Accept: application/json
+
+
+### get proxy result through middleare
+GET localhost:8080/proxy/
+Authorization: Bearer {{auth_token}}
+Content-Encoding: identity
