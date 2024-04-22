@@ -194,12 +194,12 @@ func runServer() {
 
 	// Set up routes for user management
 	r.POST("/login", loginHandler)
-	r.POST("/register", registerHandler)
-	r.GET("/profile", authMiddleware, profileHandler)
 
-	// Set up routes for token management
-	r.POST("/token/generate", generateTokenHandler)
-	r.GET("/token/validate", validateTokenHandler)
+	// Set up routes for token development
+	if !config.Release {
+		r.POST("/token/generate", generateTokenHandler)
+		r.GET("/token/validate", validateTokenHandler)
+	}
 
 	// authenticated proxy handler
 	path := fmt.Sprintf("%s/*path", config.ProxyPath)
@@ -213,7 +213,7 @@ func runServer() {
 }
 
 func main() {
-	commandlineConfig()
+	parseFlags()
 	readConfig()
 	readUsers()
 	runServer()

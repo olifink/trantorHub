@@ -30,8 +30,8 @@ var config = struct {
 	ProxyPath: "/proxy",
 }
 
-// commandlineConfig parses command line flags and updates the `config` variable accordingly.
-func commandlineConfig() {
+// parseFlags parses command line flags and updates the `config` variable accordingly.
+func parseFlags() {
 	flag.StringVar(&config.configFile, "config", "config.json", "Configuration file")
 	flag.StringVar(&config.UserFile, "users", "", "File with list of users and passwords, empty creates an 'example' user")
 	flag.IntVar(&config.ServerPort, "port", 8080, "Port for server")
