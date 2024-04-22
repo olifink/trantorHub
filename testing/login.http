@@ -4,11 +4,11 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-  "username": "seldon",
+  "username": "example",
   "password": "password"
 }
 
 ### login via Basic Auth
 
 POST http://localhost:8080/login
-Authorization: Basic seldon password
+Authorization: Basic example password

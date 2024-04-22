@@ -12,7 +12,8 @@ import (
 )
 
 var config = struct {
-	filename       string        // from commandline flag
+	configFile     string        // from commandline flag
+	UserFile       string        `json:"userFile"`
 	Release        bool          `json:"debug"`
 	ServerPort     int           `json:"serverPort"`
 	JwtSecret      string        `json:"jwtSecret"`
@@ -31,24 +32,25 @@ var config = struct {
 
 // commandlineConfig parses command line flags and updates the `config` variable accordingly.
 func commandlineConfig() {
-	flag.StringVar(&config.filename, "config", "config.json", "Configuration file")
+	flag.StringVar(&config.configFile, "config", "config.json", "Configuration file")
+	flag.StringVar(&config.UserFile, "users", "", "File with list of users and passwords, empty creates an 'example' user")
 	flag.IntVar(&config.ServerPort, "port", 8080, "Port for server")
 	flag.StringVar(&config.Target, "target", "http://example.com/", "Target URL for proxying requests")
-	flag.BoolVar(&config.Release, "release", false, "Release mode")
+	flag.BoolVar(&config.Release, "release", false, "Enable release mode")
 	flag.Parse()
 }
 
 // Open and read the configuration file, decode its contents into the `config` variable,
 func readConfig() {
-	file, err := os.Open(config.filename)
+	file, err := os.Open(config.configFile)
 	if err == nil {
-		fmt.Println("Using configuration file", config.filename)
+		fmt.Println("Using configuration file", config.configFile)
 		defer file.Close()
 
 		decoder := json.NewDecoder(file)
 		err = decoder.Decode(&config)
 		if err != nil {
-			fmt.Println("Error decoding config", config.filename, err)
+			fmt.Println("Error decoding config", config.configFile, err)
 			return
 		}
 	} else {

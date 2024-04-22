@@ -215,5 +215,6 @@ func runServer() {
 func main() {
 	commandlineConfig()
 	readConfig()
+	readUsers()
 	runServer()
 }
