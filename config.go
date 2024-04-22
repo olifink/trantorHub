@@ -11,6 +11,24 @@ import (
 	"time"
 )
 
+var config = struct {
+	filename       string        // from commandline flag
+	Release        bool          `json:"debug"`
+	ServerPort     int           `json:"serverPort"`
+	JwtSecret      string        `json:"jwtSecret"`
+	JwtIssuer      string        `json:"jwtIssuer"`
+	JwtExpire      string        `json:"jwtExpire"`
+	ProxyPath      string        `json:"proxyPath"`
+	Target         string        `json:"target"`
+	targetUrl      url.URL       // parsed from Target
+	expireDuration time.Duration // parsed from JwtExpire
+}{
+	JwtSecret: "my-secret-key",
+	JwtIssuer: "trantor-hub",
+	JwtExpire: "0s",
+	ProxyPath: "/proxy",
+}
+
 // commandlineConfig parses command line flags and updates the `config` variable accordingly.
 func commandlineConfig() {
 	flag.StringVar(&config.filename, "config", "config.json", "Configuration file")

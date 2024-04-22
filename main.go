@@ -9,41 +9,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
-	"time"
 )
-
-var config = struct {
-	filename       string        // from commandline flag
-	Release        bool          `json:"debug"`
-	ServerPort     int           `json:"serverPort"`
-	JwtSecret      string        `json:"jwtSecret"`
-	JwtIssuer      string        `json:"jwtIssuer"`
-	JwtExpire      string        `json:"jwtExpire"`
-	ProxyPath      string        `json:"proxyPath"`
-	Target         string        `json:"target"`
-	targetUrl      url.URL       // parsed from Target
-	expireDuration time.Duration // parsed from JwtExpire
-}{
-	JwtSecret: "my-secret-key",
-	JwtIssuer: "trantor-hub",
-	JwtExpire: "0s",
-	ProxyPath: "/proxy",
-}
-
-type User struct {
-	ID       int
-	Username string
-	Password string // This should be a hashed password
-}
-
-// GetUserByUsername fetches a user by username from the database
-func GetUserByUsername(username string) (*User, error) {
-	// TODO Database fetching logic here
-	// For now, let's assume we get some user or nil if not found
-	return &User{ID: 1, Username: "example", Password: "$2a$14$HNOQGnDpfyF/95TT6VToEuyS4NCYKXH1pVlcq9fx9JaC/zBW.cn0i"}, nil // bcrypt hash for "password"
-}
 
 // loginHandler handles the login request and generates a JWT token if the authentication is successful
 // It uses BasicAuth to authenticate the user, checks if the user exists in the database,
