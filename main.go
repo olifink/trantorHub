@@ -16,6 +16,7 @@ import (
 
 var config = struct {
 	filename       string        // from commandline flag
+	Release        bool          `json:"debug"`
 	ServerPort     int           `json:"serverPort"`
 	JwtSecret      string        `json:"jwtSecret"`
 	JwtIssuer      string        `json:"jwtIssuer"`
@@ -27,7 +28,7 @@ var config = struct {
 }{
 	JwtSecret: "my-secret-key",
 	JwtIssuer: "trantor-hub",
-	JwtExpire: "5m",
+	JwtExpire: "0s",
 	ProxyPath: "/proxy",
 }
 
@@ -218,6 +219,10 @@ func proxyHandler(c *gin.Context) {
 
 func runServer() {
 
+	if config.Release {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
 	// Set up routes for user management
@@ -234,7 +239,10 @@ func runServer() {
 	r.Any(path, authMiddleware, proxyHandler)
 
 	// Run the server
-	r.Run(fmt.Sprintf(":%d", config.ServerPort)) // listens and serves on defined port
+	err := r.Run(fmt.Sprintf(":%d", config.ServerPort))
+	if err != nil {
+		log.Fatal(err)
+	} // listens and serves on defined port
 }
 
 func main() {

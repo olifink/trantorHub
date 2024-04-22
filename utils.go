@@ -16,6 +16,7 @@ func commandlineConfig() {
 	flag.StringVar(&config.filename, "config", "config.json", "Configuration file")
 	flag.IntVar(&config.ServerPort, "port", 8080, "Port for server")
 	flag.StringVar(&config.Target, "target", "http://example.com/", "Target URL for proxying requests")
+	flag.BoolVar(&config.Release, "release", false, "Release mode")
 	flag.Parse()
 }
 
@@ -59,7 +60,11 @@ func readConfig() {
 	log.Println("Server Port:", config.ServerPort)
 	log.Println("Target URL:", config.targetUrl.String())
 	log.Println("Proxy Path:", config.ProxyPath)
-	log.Println("JWT Expire:", config.expireDuration.String())
+	if config.expireDuration.Seconds() > 0 {
+		log.Println("JWT Expire:", config.expireDuration.String())
+	} else {
+		log.Println("JWT Expire:", "never")
+	}
 	log.Println("JWT Secret:", anonymize(config.JwtSecret))
 	log.Println("JWT Issuer:", config.JwtIssuer)
 }
