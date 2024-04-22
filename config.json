@@ -1,4 +1,6 @@
 {
   "serverPort": 8080,
-  "jwtSecret": "your_secret_key"
+  "jwtSecret": "your_secret_key",
+  "jwtIssuer":  "my-trantor-hub",
+  "jwtExpire": "10m"
 }

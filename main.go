@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,36 +9,32 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
+	"net/url"
 	"strings"
 	"time"
 )
 
-const CONFIG_FILE = "config.json"
-
 var config = struct {
-	ServerPort int    `json:"serverPort"`
-	JwtSecret  string `json:"jwtSecret"`
-	JwtIssuer  string `json:"jwtIssuer"`
+	filename       string        // from commandline flag
+	ServerPort     int           `json:"serverPort"`
+	JwtSecret      string        `json:"jwtSecret"`
+	JwtIssuer      string        `json:"jwtIssuer"`
+	JwtExpire      string        `json:"jwtExpire"`
+	ProxyPath      string        `json:"proxyPath"`
+	Target         string        `json:"target"`
+	targetUrl      url.URL       // parsed from Target
+	expireDuration time.Duration // parsed from JwtExpire
 }{
-	ServerPort: 8080,
-	JwtSecret:  "my-secret-key",
-	JwtIssuer:  "trantor-hub",
+	JwtSecret: "my-secret-key",
+	JwtIssuer: "trantor-hub",
+	JwtExpire: "5m",
+	ProxyPath: "/proxy",
 }
 
 type User struct {
 	ID       int
 	Username string
 	Password string // This should be a hashed password
-}
-
-// Anonymize a part of a sensitive string
-func anonymize(s string) string {
-	if len(s) > 4 {
-		return s[:2] + "****" + s[len(s)-2:]
-	} else {
-		return "****"
-	}
 }
 
 // GetUserByUsername fetches a user by username from the database
@@ -56,6 +51,7 @@ func GetUserByUsername(username string) (*User, error) {
 func loginHandler(c *gin.Context) {
 	var username, password string
 
+	log.Println(c.FullPath())
 	// check if there is an authorization in the request
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
@@ -118,23 +114,6 @@ func loginHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"token": tokenString})
 }
 
-func generateNewToken(username string) (string, error) {
-	// Set expiration time of the token
-	expirationTime := time.Now().Add(5 * time.Minute)
-	// Create the JWT claims, which includes the username and expiry time
-	claims := &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(expirationTime),
-		Issuer:    config.JwtIssuer,
-		Subject:   username,
-	}
-
-	// Declare the token with the algorithm used for signing, and the claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// Create the JWT string
-	secret := []byte(config.JwtSecret)
-	return token.SignedString(secret)
-}
-
 func registerHandler(c *gin.Context) {
 	// TODO: Implement registerHandler
 }
@@ -146,11 +125,6 @@ func authMiddleware(c *gin.Context) {
 		return
 	}
 	c.Next()
-}
-
-func isValidToken(tknStr string) bool {
-	tkn, err := parseTokenString(tknStr)
-	return err == nil && tkn.Valid
 }
 
 func profileHandler(c *gin.Context) {
@@ -199,10 +173,13 @@ func parseTokenString(tknStr string) (*jwt.Token, error) {
 
 func proxyHandler(c *gin.Context) {
 	// Determine the target URL (modify as needed)
-	targetURL := "http://example.com" + c.Param("path")
+	targetURL := config.targetUrl
+	targetURL.Path = c.Param("path")
+
+	log.Println("Proxying to", targetURL.String())
 
 	// Create a new request to the target service, copying the method and the body
-	proxyReq, err := http.NewRequest(c.Request.Method, targetURL, c.Request.Body)
+	proxyReq, err := http.NewRequest(c.Request.Method, targetURL.String(), c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
 		return
@@ -239,27 +216,6 @@ func proxyHandler(c *gin.Context) {
 	c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 }
 
-func readConfig() {
-	file, err := os.Open(CONFIG_FILE)
-	if err == nil {
-		fmt.Println("Using configuration file", CONFIG_FILE)
-		defer file.Close()
-
-		decoder := json.NewDecoder(file)
-		err = decoder.Decode(&config)
-		if err != nil {
-			fmt.Println("Error decoding config", CONFIG_FILE, err)
-			return
-		}
-	} else {
-		fmt.Println("Using default configuration")
-	}
-
-	log.Println("Server Port:", config.ServerPort)
-	log.Println("JWT Secret:", anonymize(config.JwtSecret))
-	log.Println("JWT Issuer:", config.JwtIssuer)
-}
-
 func runServer() {
 
 	r := gin.Default()
@@ -274,13 +230,15 @@ func runServer() {
 	r.GET("/token/validate", validateTokenHandler)
 
 	// authenticated proxy handler
-	r.Any("/proxy/*path", authMiddleware, proxyHandler)
+	path := fmt.Sprintf("%s/*path", config.ProxyPath)
+	r.Any(path, authMiddleware, proxyHandler)
 
 	// Run the server
 	r.Run(fmt.Sprintf(":%d", config.ServerPort)) // listens and serves on defined port
 }
 
 func main() {
+	commandlineConfig()
 	readConfig()
 	runServer()
 }
