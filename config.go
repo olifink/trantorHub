@@ -61,21 +61,21 @@ func readConfig() {
 
 	u, err := url.Parse(config.Target)
 	if err != nil {
-		log.Panicln("Error parsing target URL:", err)
+		log.Fatalln("Error parsing target URL:", err)
 	}
 	config.targetUrl = *u
 
 	if !strings.HasPrefix(config.ProxyPath, "/") {
-		log.Panicln("ProxyPath must start with /", config.ProxyPath)
+		log.Fatalln("ProxyPath must start with /", config.ProxyPath)
 	}
 
 	if len(config.ProxyPath) < 2 {
-		log.Panicln("ProxyPath must have a name")
+		log.Fatalln("ProxyPath must have a name")
 	}
 
 	expireDuration, err := time.ParseDuration(config.JwtExpire)
 	if err != nil {
-		log.Panicln("Error parsing JWT expire duration:", err)
+		log.Fatalln("Error parsing JWT expire duration:", err)
 	}
 	config.expireDuration = expireDuration
 

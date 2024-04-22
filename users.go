@@ -39,7 +39,7 @@ func readUsers() {
 	} else {
 		file, err := os.Open(config.UserFile)
 		if err != nil {
-			log.Panicln("Error opening user file:", err)
+			log.Fatalln("Error opening user file:", err)
 		}
 		defer file.Close()
 		data = file
@@ -54,7 +54,7 @@ func readUsers() {
 	// read all entries into user array
 	records, err := r.ReadAll()
 	if err != nil {
-		log.Panicln("error reading users", err)
+		log.Fatalln("error reading users", err)
 	}
 
 	Users = make([]User, len(records))
