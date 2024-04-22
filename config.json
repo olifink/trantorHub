@@ -2,5 +2,6 @@
   "serverPort": 8080,
   "jwtSecret": "your_secret_key",
   "jwtIssuer":  "my-trantor-hub",
-  "jwtExpire": "10m"
+  "jwtExpire": "10m",
+  "proxyPath": "/api"
 }
