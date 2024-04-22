@@ -2,15 +2,14 @@
 
 ## Done 
 
-* Allow Anonymous GET (not logged in)
-
-# Plans
+* [x] Allow Anonymous GET (not logged in)
 
 ## Quick wins
 
-* Token refresh handler
-* Origin lock configuration
-* Cli get token for user
+* [ ] Token refresh handler
+* [ ] Check for non-existant user in token validation
+* [ ] Origin lock configuration
+* [ ] Cli get token for user
 
 ## New feature ideas before 1.0
 
@@ -28,5 +27,7 @@
 
 * Multiple route endpoints
 * Permissions to allow only some methods  based on groups (GET/HEAD, PUT/POST, DELETE)
-* SQLite for users/groups (is this really worth it?)
-* OpenTelemetry
+* Allow users to manage/generate their own tokens
+* SQLite, and other DBs for users/groups (is this really worth it?)
+* OpenTelemetry throughput, limits
+* Re-doc, OpenAPI generation?

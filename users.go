@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -58,10 +59,10 @@ func readUsers() {
 
 	Users = make([]User, len(records))
 	for i, record := range records {
+		log.Println(fmt.Sprintf("User %d: %s %s", i, record[0], anonymize(record[1])))
 		Users[i] = User{
 			Username: record[0],
 			Password: record[1],
 		}
 	}
-	log.Println("Users:", Users)
 }
