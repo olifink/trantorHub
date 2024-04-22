@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"strings"
 	"time"
 )
 
@@ -29,4 +30,14 @@ func generateNewToken(username string) (string, error) {
 func isValidToken(tknStr string) bool {
 	tkn, err := parseTokenString(tknStr)
 	return err == nil && tkn.Valid
+}
+
+func parseTokenString(tknStr string) (*jwt.Token, error) {
+	tknStr = strings.TrimPrefix(tknStr, "Bearer ")
+	claims := &jwt.RegisteredClaims{}
+	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+		secret := []byte(config.JwtSecret)
+		return secret, nil
+	})
+	return tkn, err
 }
