@@ -7,7 +7,12 @@ import (
 )
 
 func authMiddleware(c *gin.Context) {
-	// Example: Validate JWT
+	// allow unauthenticated GET requests if configured
+	if config.AllowGet && c.Request.Method == "GET" {
+		c.Next()
+	}
+
+	// otherwise validate JWT
 	if !isValidToken(c.GetHeader("Authorization")) {
 		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
 		return

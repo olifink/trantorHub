@@ -14,12 +14,13 @@ import (
 var config = struct {
 	configFile     string        // from commandline flag
 	UserFile       string        `json:"userFile"`
-	Release        bool          `json:"debug"`
+	Release        bool          `json:"releaseMode"`
 	ServerPort     int           `json:"serverPort"`
 	JwtSecret      string        `json:"jwtSecret"`
 	JwtIssuer      string        `json:"jwtIssuer"`
 	JwtExpire      string        `json:"jwtExpire"`
 	ProxyPath      string        `json:"proxyPath"`
+	AllowGet       bool          `json:"allowGet"`
 	Target         string        `json:"target"`
 	targetUrl      url.URL       // parsed from Target
 	expireDuration time.Duration // parsed from JwtExpire
@@ -28,6 +29,7 @@ var config = struct {
 	JwtIssuer: "trantor-hub",
 	JwtExpire: "0s",
 	ProxyPath: "/proxy",
+	AllowGet:  false,
 }
 
 // parseFlags parses command line flags and updates the `config` variable accordingly.

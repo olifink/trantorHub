@@ -1,10 +1,15 @@
+# Features
+
+## Done 
+
+* Allow Anonymous GET (not logged in)
+
 # Plans
 
 ## Quick wins
 
-* Allow Anonymous GET (not logged in)
-* Token refresh
-* Origin lock
+* Token refresh handler
+* Origin lock configuration
 * Cli get token for user
 
 ## New feature ideas before 1.0
