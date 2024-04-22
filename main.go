@@ -17,7 +17,7 @@ import (
 // verifies the password, and generates a token with a 5-minute expiration time if the password is valid.
 // The generated token is returned as a JSON response or an appropriate error response if any authentication step fails.
 func loginHandler(c *gin.Context) {
-	var username, password string
+	var username, password, redirect string
 
 	log.Println(c.FullPath())
 	// check if there is an authorization in the request
@@ -27,24 +27,37 @@ func loginHandler(c *gin.Context) {
 		// if not, see if it's a json request with login data
 		contentType := c.GetHeader("Content-Type")
 
-		if contentType != "application/json" {
-			c.JSON(415, gin.H{"error": "Content-Type must be application/json if no authorization header provided"})
-			return
+		if contentType == "application/json" {
+			log.Println("login handling application/json")
+
+			// parse login data
+			var loginData struct {
+				Username string `json:"username"`
+				Password string `json:"password"`
+			}
+
+			if err := c.ShouldBindJSON(&loginData); err != nil {
+				c.JSON(400, gin.H{"error": "Invalid login data"})
+				return
+			}
+			username = loginData.Username
+			password = loginData.Password
+		} else if contentType == "application/x-www-form-urlencoded" {
+			log.Println("login handling application/x-www-form-urlencoded")
+
+			// parse form data
+			err := c.Request.ParseForm()
+			if err != nil {
+				c.JSON(400, gin.H{"error": "Invalid form data"})
+				return
+			}
+			username = c.Request.Form.Get("username")
+			password = c.Request.Form.Get("password")
+			redirect = c.Request.Form.Get("redirect")
 		}
 
-		// parse login data
-		var loginData struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
-
-		if err := c.ShouldBindJSON(&loginData); err != nil {
-			c.JSON(400, gin.H{"error": "Invalid login data"})
-			return
-		}
-		username = loginData.Username
-		password = loginData.Password
 	} else {
+		log.Println("login handling Basic Auth")
 		// BasicAuth loginHandler
 		ok := false
 		username, password, ok = c.Request.BasicAuth()
@@ -79,11 +92,12 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"token": tokenString})
-}
-
-func registerHandler(c *gin.Context) {
-	// TODO: Implement registerHandler
+	c.Header("Authorization", fmt.Sprintf("Bearer %s", tokenString))
+	if redirect != "" {
+		c.Redirect(http.StatusFound, redirect)
+	} else {
+		c.JSON(200, gin.H{"token": tokenString})
+	}
 }
 
 func authMiddleware(c *gin.Context) {
@@ -93,10 +107,6 @@ func authMiddleware(c *gin.Context) {
 		return
 	}
 	c.Next()
-}
-
-func profileHandler(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Hello World!"})
 }
 
 func generateTokenHandler(c *gin.Context) {

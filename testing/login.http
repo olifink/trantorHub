@@ -1,4 +1,4 @@
-### login option with JSON structure
+### login option with JSON structure that works by default
 
 POST http://localhost:8080/login
 Content-Type: application/json
@@ -8,7 +8,39 @@ Content-Type: application/json
   "password": "password"
 }
 
+> {% client.global.set("auth_token", response.body.token); %}
+
+### login option with JSON structure that works if users.txt is loaded (user/hello, admin/admin123)
+
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "hello"
+}
+
+> {% client.global.set("auth_token", response.body.token); %}
+
+
 ### login via Basic Auth
 
 POST http://localhost:8080/login
 Authorization: Basic example password
+
+> {% client.global.set("auth_token", response.body.token); %}
+
+
+### login via form
+
+POST http://localhost:8080/login
+Content-Type: application/x-www-form-urlencoded
+
+username = example &
+password = password &
+redirect = success.html
+
+### get proxy result through middleare
+GET localhost:8080/proxy/
+Authorization: Bearer {{auth_token}}
+Content-Encoding: identity
