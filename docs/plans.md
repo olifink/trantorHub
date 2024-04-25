@@ -1,17 +1,22 @@
 # Features
 
-## Done 
+
+
+## Done - not released yet 
 
 * [x] Allow Anonymous GET (not logged in)
 
-## Quick wins
+## In progress
+
+## Planned - Quick wins
 
 * [ ] Token refresh handler
 * [ ] Check for non-existant user in token validation
 * [ ] Origin lock configuration
 * [ ] Cli get token for user
+* [ ] Pass anonymized user to backend service
 
-## New feature ideas before 1.0
+## Mid-term - ideas before 1.0
 
 * Custom root redirect config
 * Write back users file
@@ -23,7 +28,7 @@
 * Auto TLS configuration with domain names list
 * Umami statistics support
 
-## Bigger ideas
+## Long-term - future versions
 
 * Multiple route endpoints
 * Permissions to allow only some methods  based on groups (GET/HEAD, PUT/POST, DELETE)

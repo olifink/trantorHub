@@ -1,0 +1,61 @@
+name: Go Release, Build for All Platforms
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.22
+  
+    - name: Build for Linux (Intel)
+      run: |
+        GOOS=linux GOARCH=amd64 go build -v .
+      shell: bash
+
+    - name: Build for Linux (ARM)
+      run: |
+        GOOS=linux GOARCH=arm go build -v .
+      shell: bash
+
+    - name: Build for macOS (Intel)
+      run: |
+        GOOS=darwin GOARCH=amd64 go build -v .
+      shell: bash
+
+    - name: Build for macOS (ARM)
+      run: |
+        GOOS=darwin GOARCH=arm64 go build -v .
+      shell: bash
+
+    - name: Build for Windows (Intel)
+      run: |
+        GOOS=windows GOARCH=amd64 go build -v .
+      shell: bash
+
+    - name: Build for Windows (ARM)
+      run: |
+        GOOS=windows GOARCH=arm go build -v .
+      shell: bash
+
+    - name: Prepare artifacts
+      run: |
+        mkdir artifacts
+        mv trantorHub* artifacts/
+      shell: bash
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: trantorHub
+        path: artifacts/
