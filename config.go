@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const ENV_SECRET = "TRANTOR_JWT_SECRET"
+
 var config = struct {
 	configFile     string        // from commandline flag
 	UserFile       string        `json:"userFile"`
@@ -40,6 +42,13 @@ func parseFlags() {
 	flag.StringVar(&config.Target, "target", "http://example.com/", "Target URL for proxying requests")
 	flag.BoolVar(&config.Release, "release", false, "Enable release mode")
 	flag.Parse()
+}
+
+// Check environment variables if secret is not configured yet
+func readEnv() {
+	if config.JwtSecret == "" {
+		config.JwtSecret = os.Getenv(ENV_SECRET)
+	}
 }
 
 // Open and read the configuration file, decode its contents into the `config` variable,

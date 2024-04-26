@@ -51,6 +51,7 @@ func runServer() {
 func main() {
 	parseFlags()
 	readConfig()
+	readEnv()
 	readUsers()
 	runServer()
 }

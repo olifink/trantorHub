@@ -5,8 +5,10 @@
 ## Done - not released yet 
 
 * [x] Allow Anonymous GET (not logged in)
+* [x] Read `JwtSecret` from ENV if not configured otherwise
 
 ## In progress
+
 
 ## Planned - Quick wins
 
