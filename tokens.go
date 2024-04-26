@@ -27,8 +27,7 @@ func generateNewToken(username string) (string, error) {
 	return token.SignedString(secret)
 }
 
-func isValidToken(tknStr string) bool {
-	tkn, err := parseTokenString(tknStr)
+func isValidToken(tkn *jwt.Token, err error) bool {
 	return err == nil && tkn.Valid
 }
 

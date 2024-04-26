@@ -12,7 +12,8 @@ import (
 type User struct {
 	//ID       int
 	Username string
-	Password string // This should be a hashed password
+	Password string // This is a bcyrpt hashed password
+	Identity string // Hashed username for downstream systems
 }
 
 var Users []User
@@ -63,6 +64,7 @@ func readUsers() {
 		Users[i] = User{
 			Username: record[0],
 			Password: record[1],
+			Identity: createHash(record[0]),
 		}
 	}
 }

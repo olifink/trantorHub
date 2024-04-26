@@ -7,16 +7,38 @@ import (
 )
 
 func authMiddleware(c *gin.Context) {
+	// get authorization header
+	tknStr := c.GetHeader("Authorization")
+
 	// allow unauthenticated GET requests if configured
-	if config.AllowGet && c.Request.Method == "GET" {
+	if tknStr == "" && config.AllowGet && c.Request.Method == "GET" {
 		c.Next()
 	}
 
 	// otherwise validate JWT
-	if !isValidToken(c.GetHeader("Authorization")) {
+	tkn, err := parseTokenString(tknStr)
+	if !isValidToken(tkn, err) {
 		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
+
+	// get the subject username from the token
+	username, err := tkn.Claims.GetSubject()
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{"error": "internal server error"})
+		return
+	}
+
+	// find the corresponding user
+	user, err := GetUserByUsername(username)
+	if user == nil {
+		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	// store user in context if we need it here
+	c.Set("username", username)
+
 	c.Next()
 }
 

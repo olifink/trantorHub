@@ -6,6 +6,9 @@
 
 * [x] Allow Anonymous GET (not logged in)
 * [x] Read `JwtSecret` from ENV if not configured otherwise
+* [x] Deny no-longer existing user in of valid tokens
+* [x] Pass identity header to downstream service (pseudonymisation)
+
 
 ## In progress
 
@@ -13,10 +16,7 @@
 ## Planned - Quick wins
 
 * [ ] Token refresh handler
-* [ ] Check for non-existant user in token validation
-* [ ] Origin lock configuration
-* [ ] Cli get token for user
-* [ ] Pass anonymized user to backend service
+* [ ] CLI way to get token for user
 
 ## Mid-term - ideas before 1.0
 
@@ -32,6 +32,7 @@
 
 ## Long-term - future versions
 
+* Origin lock configuration
 * Multiple route endpoints
 * Permissions to allow only some methods  based on groups (GET/HEAD, PUT/POST, DELETE)
 * Allow users to manage/generate their own tokens
