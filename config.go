@@ -99,12 +99,3 @@ func readConfig() {
 	log.Println("JWT Secret:", anonymize(config.JwtSecret))
 	log.Println("JWT Issuer:", config.JwtIssuer)
 }
-
-// Anonymize a part of a sensitive string
-func anonymize(s string) string {
-	if len(s) > 4 {
-		return s[:2] + "****" + s[len(s)-2:]
-	} else {
-		return "****"
-	}
-}
