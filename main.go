@@ -2,23 +2,43 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
+	"strings"
 )
 
-func authMiddleware(c *gin.Context) {
-	// get authorization header
-	tknStr := c.GetHeader("Authorization")
-
-	// allow unauthenticated GET requests if configured
-	if tknStr == "" && config.AllowGet && c.Request.Method == "GET" {
+func authenticateRequest(c *gin.Context) {
+	// see if public GET is allowed
+	if config.AllowGet && c.Request.Method == "GET" {
 		c.Next()
 	}
 
-	// otherwise validate JWT
-	tkn, err := parseTokenString(tknStr)
+	// Check the authorization header
+	authHeader := c.GetHeader("Authorization")
+	if authHeader != "" {
+		// Remove "Bearer " from the beginning (if it exists)
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+
+		// Proceed to authenticate with this token
+		authenticateUsingJWT(c, token)
+	} else {
+		// If authorization header doesn't exist, check the cookies
+		if cookieToken, err := c.Cookie("authToken"); err == nil {
+			// Proceed to authenticate with the token from the cookie
+			authenticateUsingJWT(c, cookieToken)
+		} else {
+			// No token in cookies either, respond with error
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No authorization token was found"})
+		}
+	}
+}
+
+func authenticateUsingJWT(c *gin.Context, token string) {
+	tkn, err := parseTokenString(token)
 	if !isValidToken(tkn, err) {
-		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
@@ -38,8 +58,11 @@ func authMiddleware(c *gin.Context) {
 
 	// store user in context if we need it here
 	c.Set("username", username)
-
 	c.Next()
+}
+
+func authMiddleware(c *gin.Context) {
+	authenticateRequest(c)
 }
 
 func runServer() {
@@ -50,7 +73,14 @@ func runServer() {
 
 	r := gin.Default()
 
-	// Set up routes for user management
+	if config.AllowCors {
+		config := cors.DefaultConfig()
+		config.AllowAllOrigins = true
+		config.AllowMethods = []string{"OPTIONS", "POST"}
+
+		r.Use(cors.New(config))
+	}
+
 	r.POST("/login", loginHandler)
 
 	// Set up routes for token development
@@ -58,6 +88,8 @@ func runServer() {
 		r.POST("/token/generate", generateTokenHandler)
 		r.GET("/token/validate", validateTokenHandler)
 	}
+
+	r.StaticFS("/web", http.Dir("web"))
 
 	// authenticated proxy handler
 	path := fmt.Sprintf("%s/*path", config.ProxyPath)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -91,7 +90,19 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	c.Header("Authorization", fmt.Sprintf("Bearer %s", tokenString))
+	//c.Header("Authorization", fmt.Sprintf("Bearer %s", tokenString))
+	maxAge := int(config.expireDuration.Seconds())
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie(
+		"authToken",
+		tokenString,
+		maxAge,
+		"/",
+		"",
+		config.Release,
+		true,
+	)
+
 	if redirect != "" {
 		c.Redirect(http.StatusFound, redirect)
 	} else {

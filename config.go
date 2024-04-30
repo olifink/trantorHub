@@ -23,15 +23,17 @@ var config = struct {
 	JwtExpire      string        `json:"jwtExpire"`
 	ProxyPath      string        `json:"proxyPath"`
 	AllowGet       bool          `json:"allowGet"`
+	AllowCors      bool          `json:"allowCors"`
 	Target         string        `json:"target"`
 	targetUrl      url.URL       // parsed from Target
 	expireDuration time.Duration // parsed from JwtExpire
 }{
 	JwtSecret: "my-secret-key",
-	JwtIssuer: "trantor-hub",
+	JwtIssuer: "localhost",
 	JwtExpire: "0s",
 	ProxyPath: "/proxy",
 	AllowGet:  false,
+	AllowCors: true,
 }
 
 // parseFlags parses command line flags and updates the `config` variable accordingly.
