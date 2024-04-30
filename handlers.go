@@ -110,6 +110,25 @@ func loginHandler(c *gin.Context) {
 	}
 }
 
+func logoutHandler(c *gin.Context) {
+	// Clear the auth token cookie
+	c.SetCookie(
+		"authToken",
+		"",
+		-1,
+		"/",
+		"",
+		config.Release,
+		true,
+	)
+	if c.Request.ParseForm() == nil {
+		redirect := c.Request.Form.Get("redirect")
+		c.Redirect(http.StatusFound, redirect)
+	} else {
+		c.JSON(200, gin.H{"token": nil})
+	}
+}
+
 func generateTokenHandler(c *gin.Context) {
 	tokenString, err := generateNewToken("example")
 	if err != nil {

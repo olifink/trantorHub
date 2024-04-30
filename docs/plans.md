@@ -12,6 +12,8 @@
 
 ## In progress
 
+* [ ] rework handler strucutures
+* [ ] re-factor web ui and redirect flow
 
 ## Planned - Quick wins
 

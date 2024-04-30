@@ -4,17 +4,25 @@
     <title>Simple Login Form</title>
 </head>
 <body>
-<form id="loginForm">
+
+<form id="loginForm" action="http://localhost:8080/login" method="post">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
-    <input type="submit" value="Submit">
+    <input type="hidden" name="redirect" value="http://localhost:8080/proxy">
+    <input type="submit" value="Login">
 </form>
+
+<form id="logoutForm" action="http://localhost:8080/logout" method="post">
+    <input type="hidden" name="redirect" value="http://localhost:8080/proxy">
+    <input type="submit" value="Logout">
+</form>
+
 
 <p>
     <a href="http://localhost:8080/proxy">Try a secured page here</a>
 </p>
-<script src="script.js"></script>
+<!--<script src="script.js"></script>-->
 </body>
 </html>

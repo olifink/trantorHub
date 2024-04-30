@@ -22,6 +22,7 @@ var config = struct {
 	JwtIssuer      string        `json:"jwtIssuer"`
 	JwtExpire      string        `json:"jwtExpire"`
 	ProxyPath      string        `json:"proxyPath"`
+	NoCache        bool          `json:"noCache"`
 	AllowGet       bool          `json:"allowGet"`
 	AllowCors      bool          `json:"allowCors"`
 	Target         string        `json:"target"`
@@ -32,6 +33,7 @@ var config = struct {
 	JwtIssuer: "localhost",
 	JwtExpire: "0s",
 	ProxyPath: "/proxy",
+	NoCache:   true,
 	AllowGet:  false,
 	AllowCors: true,
 }

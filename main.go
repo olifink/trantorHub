@@ -65,6 +65,12 @@ func authMiddleware(c *gin.Context) {
 	authenticateRequest(c)
 }
 
+func nocacheMiddleware(c *gin.Context) {
+	c.Header("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1
+	c.Header("Pragma", "no-cache")                                   // HTTP 1.0
+	c.Header("Expires", "0")                                         // Proxies
+}
+
 func runServer() {
 
 	if config.Release {
@@ -80,8 +86,12 @@ func runServer() {
 
 		r.Use(cors.New(config))
 	}
+	if config.NoCache {
+		r.Use(nocacheMiddleware)
+	}
 
 	r.POST("/login", loginHandler)
+	r.POST("/logout", logoutHandler)
 
 	// Set up routes for token development
 	if !config.Release {
