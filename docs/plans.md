@@ -9,11 +9,11 @@
 * [x] Deny no-longer existing user in of valid tokens
 * [x] Pass identity header to downstream service (pseudonymisation)
 * [x] rework handler structures
-
+* [x] re-factor web ui and redirect flow
 
 ## In progress
 
-* [ ] re-factor web ui and redirect flow
+
 
 ## Planned - Quick wins
 
@@ -23,6 +23,7 @@
 * [ ] Token refresh handler
 * [ ] CLI way to get token for user
 * [ ] Reset password
+* [ ] Rate limiter using https://github.com/didip/tollbooth_gin 
 
 ## Mid-term - ideas before 1.0
 

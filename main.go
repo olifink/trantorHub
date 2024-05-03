@@ -22,11 +22,12 @@ func runServer() {
 	}
 
 	// token creation
-	r.POST("/login", loginHandler)
+	r.POST("/token", tokenHandler)
 
 	if config.AllowWebLogin {
 		r.LoadHTMLGlob("templates/*.html")
 		r.GET("/login", webFormHandler)
+		r.POST("/login", loginHandler)
 		r.POST("/logout", logoutHandler)
 	}
 

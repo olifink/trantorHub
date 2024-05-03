@@ -37,7 +37,7 @@ var config = struct {
 	NoCacheHeaders: true,
 	AllowPublicGet: false,
 	AllowCors:      true,
-	AllowWebLogin:  false,
+	AllowWebLogin:  true,
 }
 
 // parseFlags parses command line flags and updates the `config` variable accordingly.

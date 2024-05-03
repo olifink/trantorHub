@@ -1,6 +1,6 @@
 ### login option with JSON structure that works by default
 
-POST http://localhost:8080/login
+POST http://localhost:8080/token
 Content-Type: application/json
 
 {
@@ -12,21 +12,13 @@ Content-Type: application/json
 
 ### login option with JSON structure that works if users.txt is loaded (user/hello, admin/admin123)
 
-POST http://localhost:8080/login
+POST http://localhost:8080/token
 Content-Type: application/json
 
 {
   "username": "user",
   "password": "hello"
 }
-
-> {% client.global.set("auth_token", response.body.token); %}
-
-
-### login via Basic Auth
-
-POST http://localhost:8080/login
-Authorization: Basic example password
 
 > {% client.global.set("auth_token", response.body.token); %}
 
