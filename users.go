@@ -19,14 +19,14 @@ type User struct {
 var Users []User
 
 // GetUserByUsername fetches a user by username from the database
-func GetUserByUsername(username string) (*User, error) {
+func GetUserByUsername(username string) *User {
 	// For now, let's assume we get some user or nil if not found
 	for _, user := range Users {
 		if user.Username == username {
-			return &user, nil
+			return &user
 		}
 	}
-	return nil, nil
+	return nil
 }
 
 func readUsers() {

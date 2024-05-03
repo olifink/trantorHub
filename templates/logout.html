@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout</title>
+</head>
+<body>
+    <h1>Logout</h1>
+    <form id="logoutForm" action="/logout" method="post">
+        <input type="hidden" name="redirect" value="{{ .redirect }}">
+        <input type="submit" value="Logout">
+    </form>
+</body>
+</html>

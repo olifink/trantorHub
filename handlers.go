@@ -1,21 +1,28 @@
 package main
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"log"
 	"net/http"
 )
 
+func redirectOrJSON(c *gin.Context, redirect string, code int, h gin.H) {
+	if redirect != "" {
+		c.Redirect(http.StatusFound, redirect)
+		return
+	}
+	c.JSON(code, h)
+}
+
 // loginHandler handles the login request and generates a JWT token if the authentication is successful
 // It uses BasicAuth to authenticate the user, checks if the user exists in the database,
 // verifies the password, and generates a token with a 5-minute expiration time if the password is valid.
 // The generated token is returned as a JSON response or an appropriate error response if any authentication step fails.
 func loginHandler(c *gin.Context) {
-	var username, password, redirect string
+	var username, password string
+	var redirect, retry string
 
 	// see if it's a json or form request with login data
 	contentType := c.GetHeader("Content-Type")
@@ -31,7 +38,7 @@ func loginHandler(c *gin.Context) {
 		}
 
 		if err := c.ShouldBindJSON(&loginData); err != nil {
-			c.JSON(400, gin.H{"error": "Invalid login data"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid login data"})
 			return
 		}
 		username = loginData.Username
@@ -51,30 +58,31 @@ func loginHandler(c *gin.Context) {
 		username = c.Request.Form.Get("username")
 		password = c.Request.Form.Get("password")
 		redirect = c.Request.Form.Get("redirect")
+		retry = "/login"
 	}
 
 	// Check if the username and password are empty
 	if username == "" || password == "" {
-		c.JSON(400, gin.H{"error": "Missing username or password"})
+		redirectOrJSON(c, retry, http.StatusUnauthorized, gin.H{"error": "Missing username or password"})
 		return
 	}
 
 	// Check if we know the user
-	user, err := GetUserByUsername(username)
-	if err != nil || user == nil {
-		c.JSON(401, gin.H{"error": "Invalid username or password"})
+	user := GetUserByUsername(username)
+	if user == nil {
+		redirectOrJSON(c, retry, http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	// Check that the password matches the hashed password in the database
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		c.JSON(401, gin.H{"error": "Invalid username or password"})
+		redirectOrJSON(c, retry, http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 
 	tokenString, err := generateNewToken(username)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Could not generate token"})
+		redirectOrJSON(c, retry, http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
 
@@ -91,13 +99,8 @@ func loginHandler(c *gin.Context) {
 			config.Release,
 			true,
 		)
-
-		if redirect != "" {
-			c.Redirect(http.StatusFound, redirect)
-		}
-	} else {
-		c.JSON(200, gin.H{"token": tokenString})
 	}
+	redirectOrJSON(c, redirect, 200, gin.H{"token": tokenString})
 }
 
 // logoutHandler clears the auth token cookie and redirects the user if a redirect URL is provided.
@@ -123,36 +126,6 @@ func logoutHandler(c *gin.Context) {
 	} else {
 		c.JSON(200, gin.H{"token": nil})
 	}
-}
-
-func generateTokenHandler(c *gin.Context) {
-	tokenString, err := generateNewToken("example")
-	if err != nil {
-		c.JSON(500, gin.H{"error": "Could not generate token"})
-		return
-	}
-	c.JSON(200, gin.H{"token": tokenString})
-}
-
-func validateTokenHandler(c *gin.Context) {
-	// Parse the token
-	tknStr := c.GetHeader("Authorization")
-	tkn, err := parseTokenString(tknStr)
-
-	if err != nil {
-		if errors.Is(err, jwt.ErrSignatureInvalid) {
-			c.JSON(403, gin.H{"error": "Invalid token signature"})
-			return
-		}
-		c.JSON(400, gin.H{"error": "Invalid token"})
-		return
-	}
-	if !tkn.Valid {
-		c.JSON(403, gin.H{"error": "Invalid token"})
-		return
-	}
-
-	c.JSON(200, gin.H{"status": "Token is valid"})
 }
 
 func proxyHandler(c *gin.Context) {

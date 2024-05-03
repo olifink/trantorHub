@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
 )
@@ -33,29 +35,45 @@ func authenticateRequest(c *gin.Context) {
 	}
 }
 
-func authenticateUsingJWT(c *gin.Context, token string) {
-	tkn, err := parseTokenString(token)
-	if !isValidToken(tkn, err) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-
+// getUsernameFromToken fetches the username from the given token.
+func getUsernameFromToken(tkn *jwt.Token) (string, error) {
 	// get the subject username from the token
 	username, err := tkn.Claims.GetSubject()
 	if err != nil {
-		c.AbortWithStatusJSON(500, gin.H{"error": "internal server error"})
-		return
+		return "", fmt.Errorf("error getting subject from token: %w", err)
+	}
+	return username, nil
+}
+
+func authenticateUserFromToken(token string) (*User, error) {
+	// parse the token string
+	tkn, err := parseTokenString(token)
+	if err != nil || !tkn.Valid {
+		return nil, fmt.Errorf("error parsing token or token is invalid: %w", err)
+	}
+
+	// get the subject username from the token
+	username, err := getUsernameFromToken(tkn)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving username from token: %w", err)
 	}
 
 	// find the corresponding user
-	user, err := GetUserByUsername(username)
+	user := GetUserByUsername(username)
 	if user == nil {
-		c.AbortWithStatusJSON(401, gin.H{"error": "unauthorized"})
-		return
+		return nil, fmt.Errorf("no user found corresponding to username %s", username)
+	}
+	return user, nil
+}
+
+func authenticateUsingJWT(c *gin.Context, token string) {
+	user, err := authenticateUserFromToken(token)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 	}
 
 	// store user in context if we need it here
-	c.Set("username", username)
+	c.Set("username", user.Username)
 	c.Next()
 }
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"net/http"
 )
 
 func runServer() {
@@ -22,18 +21,13 @@ func runServer() {
 		r.Use(nocacheMiddleware)
 	}
 
+	// token creation
 	r.POST("/login", loginHandler)
-	r.POST("/logout", logoutHandler)
 
-	// Set up routes for token development
-	if !config.Release {
-		r.POST("/token/generate", generateTokenHandler)
-		r.GET("/token/validate", validateTokenHandler)
-	}
-
-	// TODO replace with tempated forms
 	if config.AllowWebLogin {
-		r.StaticFS("/web", http.Dir("web"))
+		r.LoadHTMLGlob("templates/*.html")
+		r.GET("/login", webFormHandler)
+		r.POST("/logout", logoutHandler)
 	}
 
 	// authenticated proxy handler
