@@ -11,7 +11,7 @@ import (
 
 func authenticateRequest(c *gin.Context) {
 	// see if public GET is allowed
-	if config.AllowGet && c.Request.Method == "GET" {
+	if config.AllowPublicGet && c.Request.Method == "GET" {
 		c.Next()
 	}
 
@@ -86,7 +86,7 @@ func runServer() {
 
 		r.Use(cors.New(config))
 	}
-	if config.NoCache {
+	if config.NoCacheHeaders {
 		r.Use(nocacheMiddleware)
 	}
 
@@ -99,7 +99,10 @@ func runServer() {
 		r.GET("/token/validate", validateTokenHandler)
 	}
 
-	r.StaticFS("/web", http.Dir("web"))
+	// TODO replace with tempated forms
+	if config.AllowWebLogin {
+		r.StaticFS("/web", http.Dir("web"))
+	}
 
 	// authenticated proxy handler
 	path := fmt.Sprintf("%s/*path", config.ProxyPath)

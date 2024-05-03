@@ -16,14 +16,14 @@ func generateNewToken(username string) (string, error) {
 
 	claims := &jwt.RegisteredClaims{
 		ExpiresAt: expirationTime,
-		Issuer:    config.JwtIssuer,
+		Issuer:    config.Issuer,
 		Subject:   username,
 	}
 
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// Create the JWT string
-	secret := []byte(config.JwtSecret)
+	secret := []byte(config.Secret)
 	return token.SignedString(secret)
 }
 
@@ -35,7 +35,7 @@ func parseTokenString(tknStr string) (*jwt.Token, error) {
 	tknStr = strings.TrimPrefix(tknStr, "Bearer ")
 	claims := &jwt.RegisteredClaims{}
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		secret := []byte(config.JwtSecret)
+		secret := []byte(config.Secret)
 		return secret, nil
 	})
 	return tkn, err

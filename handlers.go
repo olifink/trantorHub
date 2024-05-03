@@ -17,52 +17,40 @@ import (
 func loginHandler(c *gin.Context) {
 	var username, password, redirect string
 
-	log.Println(c.FullPath())
-	// check if there is an authorization in the request
-	authHeader := c.GetHeader("Authorization")
-	if authHeader == "" {
+	// see if it's a json or form request with login data
+	contentType := c.GetHeader("Content-Type")
 
-		// if not, see if it's a json request with login data
-		contentType := c.GetHeader("Content-Type")
+	// json api login
+	if contentType == "application/json" {
+		log.Println("login handling application/json")
 
-		if contentType == "application/json" {
-			log.Println("login handling application/json")
-
-			// parse login data
-			var loginData struct {
-				Username string `json:"username"`
-				Password string `json:"password"`
-			}
-
-			if err := c.ShouldBindJSON(&loginData); err != nil {
-				c.JSON(400, gin.H{"error": "Invalid login data"})
-				return
-			}
-			username = loginData.Username
-			password = loginData.Password
-		} else if contentType == "application/x-www-form-urlencoded" {
-			log.Println("login handling application/x-www-form-urlencoded")
-
-			// parse form data
-			err := c.Request.ParseForm()
-			if err != nil {
-				c.JSON(400, gin.H{"error": "Invalid form data"})
-				return
-			}
-			username = c.Request.Form.Get("username")
-			password = c.Request.Form.Get("password")
-			redirect = c.Request.Form.Get("redirect")
+		// parse login data
+		var loginData struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
 		}
 
-	} else {
-		log.Println("login handling Basic Auth")
-		// BasicAuth loginHandler
-		ok := false
-		username, password, ok = c.Request.BasicAuth()
-		if !ok {
-			c.JSON(401, gin.H{"error": "Authentication required"})
+		if err := c.ShouldBindJSON(&loginData); err != nil {
+			c.JSON(400, gin.H{"error": "Invalid login data"})
 			return
 		}
+		username = loginData.Username
+		password = loginData.Password
+	}
+
+	// web form encoded login
+	if config.AllowWebLogin && contentType == "application/x-www-form-urlencoded" {
+		log.Println("login handling application/x-www-form-urlencoded")
+
+		// parse form data
+		err := c.Request.ParseForm()
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Invalid form data"})
+			return
+		}
+		username = c.Request.Form.Get("username")
+		password = c.Request.Form.Get("password")
+		redirect = c.Request.Form.Get("redirect")
 	}
 
 	// Check if the username and password are empty
@@ -90,40 +78,48 @@ func loginHandler(c *gin.Context) {
 		return
 	}
 
-	//c.Header("Authorization", fmt.Sprintf("Bearer %s", tokenString))
-	maxAge := int(config.expireDuration.Seconds())
-	c.SetSameSite(http.SameSiteStrictMode)
-	c.SetCookie(
-		"authToken",
-		tokenString,
-		maxAge,
-		"/",
-		"",
-		config.Release,
-		true,
-	)
+	if config.AllowWebLogin {
+		// set authToken as HttpOnly cookie
+		maxAge := int(config.expireDuration.Seconds())
+		c.SetSameSite(http.SameSiteStrictMode)
+		c.SetCookie(
+			"authToken",
+			tokenString,
+			maxAge,
+			"/",
+			"",
+			config.Release,
+			true,
+		)
 
-	if redirect != "" {
-		c.Redirect(http.StatusFound, redirect)
+		if redirect != "" {
+			c.Redirect(http.StatusFound, redirect)
+		}
 	} else {
 		c.JSON(200, gin.H{"token": tokenString})
 	}
 }
 
+// logoutHandler clears the auth token cookie and redirects the user if a redirect URL is provided.
+// If web login is disabled, it returns an empty JSON response.
+// This handler does not require authentication.
 func logoutHandler(c *gin.Context) {
-	// Clear the auth token cookie
-	c.SetCookie(
-		"authToken",
-		"",
-		-1,
-		"/",
-		"",
-		config.Release,
-		true,
-	)
-	if c.Request.ParseForm() == nil {
-		redirect := c.Request.Form.Get("redirect")
-		c.Redirect(http.StatusFound, redirect)
+	if config.AllowWebLogin {
+		// Clear the auth token cookie
+		c.SetCookie(
+			"authToken",
+			"",
+			-1,
+			"/",
+			"",
+			config.Release,
+			true,
+		)
+		err := c.Request.ParseForm()
+		if err == nil {
+			redirect := c.Request.Form.Get("redirect")
+			c.Redirect(http.StatusFound, redirect)
+		}
 	} else {
 		c.JSON(200, gin.H{"token": nil})
 	}

@@ -18,24 +18,26 @@ var config = struct {
 	UserFile       string        `json:"userFile"`
 	Release        bool          `json:"releaseMode"`
 	ServerPort     int           `json:"serverPort"`
-	JwtSecret      string        `json:"jwtSecret"`
-	JwtIssuer      string        `json:"jwtIssuer"`
-	JwtExpire      string        `json:"jwtExpire"`
+	Secret         string        `json:"jwtSecret"`
+	Issuer         string        `json:"jwtIssuer"`
+	Expire         string        `json:"jwtExpire"`
 	ProxyPath      string        `json:"proxyPath"`
-	NoCache        bool          `json:"noCache"`
-	AllowGet       bool          `json:"allowGet"`
-	AllowCors      bool          `json:"allowCors"`
 	Target         string        `json:"target"`
+	NoCacheHeaders bool          `json:"noCacheHeaders"`
+	AllowPublicGet bool          `json:"allowPublicGet"`
+	AllowCors      bool          `json:"allowCors"`
+	AllowWebLogin  bool          `json:"AllowWebLogin"`
 	targetUrl      url.URL       // parsed from Target
-	expireDuration time.Duration // parsed from JwtExpire
+	expireDuration time.Duration // parsed from Expire
 }{
-	JwtSecret: "my-secret-key",
-	JwtIssuer: "localhost",
-	JwtExpire: "0s",
-	ProxyPath: "/proxy",
-	NoCache:   true,
-	AllowGet:  false,
-	AllowCors: true,
+	Secret:         "my-secret-key",
+	Issuer:         "localhost",
+	Expire:         "0s",
+	ProxyPath:      "/proxy",
+	NoCacheHeaders: true,
+	AllowPublicGet: false,
+	AllowCors:      true,
+	AllowWebLogin:  false,
 }
 
 // parseFlags parses command line flags and updates the `config` variable accordingly.
@@ -50,8 +52,8 @@ func parseFlags() {
 
 // Check environment variables if secret is not configured yet
 func readEnv() {
-	if config.JwtSecret == "" {
-		config.JwtSecret = os.Getenv(ENV_SECRET)
+	if config.Secret == "" {
+		config.Secret = os.Getenv(ENV_SECRET)
 	}
 }
 
@@ -86,7 +88,7 @@ func readConfig() {
 		log.Fatalln("ProxyPath must have a name")
 	}
 
-	expireDuration, err := time.ParseDuration(config.JwtExpire)
+	expireDuration, err := time.ParseDuration(config.Expire)
 	if err != nil {
 		log.Fatalln("Error parsing JWT expire duration:", err)
 	}
@@ -100,6 +102,6 @@ func readConfig() {
 	} else {
 		log.Println("JWT Expire:", "never")
 	}
-	log.Println("JWT Secret:", anonymize(config.JwtSecret))
-	log.Println("JWT Issuer:", config.JwtIssuer)
+	log.Println("JWT Secret:", anonymize(config.Secret))
+	log.Println("JWT Issuer:", config.Issuer)
 }

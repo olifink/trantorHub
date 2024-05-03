@@ -12,7 +12,7 @@
 
 ## In progress
 
-* [ ] rework handler strucutures
+* [ ] rework handler structures
 * [ ] re-factor web ui and redirect flow
 
 ## Planned - Quick wins
@@ -26,6 +26,7 @@
 
 ## Mid-term - ideas before 1.0
 
+* [ ] Web frontend support
 * [ ] Audience from origin and origin validation
 * [ ] Custom root redirect config
 * [ ] CLI options to add user to users file with bcrypt password hashes
@@ -39,6 +40,7 @@
 
 ## Long-term - future versions
 
+* OpenID Connect federation
 * Origin lock configuration
 * Multiple route endpoints
 * Permissions to allow only some methods  based on groups (GET/HEAD, PUT/POST, DELETE)
