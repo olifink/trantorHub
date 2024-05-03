@@ -8,11 +8,11 @@
 * [x] Read `JwtSecret` from ENV if not configured otherwise
 * [x] Deny no-longer existing user in of valid tokens
 * [x] Pass identity header to downstream service (pseudonymisation)
+* [x] rework handler structures
 
 
 ## In progress
 
-* [ ] rework handler structures
 * [ ] re-factor web ui and redirect flow
 
 ## Planned - Quick wins
@@ -26,6 +26,7 @@
 
 ## Mid-term - ideas before 1.0
 
+* [ ] Role for users and downstream identity
 * [ ] Web frontend support
 * [ ] Audience from origin and origin validation
 * [ ] Custom root redirect config

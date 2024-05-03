@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -17,11 +16,7 @@ func runServer() {
 	r := gin.Default()
 
 	if config.AllowCors {
-		config := cors.DefaultConfig()
-		config.AllowAllOrigins = true
-		config.AllowMethods = []string{"OPTIONS", "POST"}
-
-		r.Use(cors.New(config))
+		r.Use(corsMiddleware())
 	}
 	if config.NoCacheHeaders {
 		r.Use(nocacheMiddleware)

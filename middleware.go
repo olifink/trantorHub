@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -66,4 +67,21 @@ func nocacheMiddleware(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1
 	c.Header("Pragma", "no-cache")                                   // HTTP 1.0
 	c.Header("Expires", "0")                                         // Proxies
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowMethods = []string{
+		http.MethodGet,
+		http.MethodPost,
+		http.MethodPut,
+		http.MethodPatch,
+		http.MethodDelete,
+		http.MethodHead,
+		http.MethodOptions,
+		http.MethodTrace,
+		http.MethodConnect,
+	}
+	return cors.New(config)
 }
