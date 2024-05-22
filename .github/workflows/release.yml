@@ -11,10 +11,10 @@ jobs:
     steps:
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v5
       with:
         go-version: 1.22
   
@@ -40,12 +40,12 @@ jobs:
 
     - name: Build for Windows (Intel)
       run: |
-        GOOS=windows GOARCH=amd64 go build -o trantorHub-win-x86 -v .
+        GOOS=windows GOARCH=amd64 go build -o trantorHub-win-x86.exe -v .
       shell: bash
 
     - name: Build for Windows (ARM)
       run: |
-        GOOS=windows GOARCH=arm go build -o trantorHub-win-arm -v .
+        GOOS=windows GOARCH=arm go build -o trantorHub-win-arm.exe -v .
       shell: bash
 
     - name: Prepare artifacts
@@ -55,7 +55,7 @@ jobs:
       shell: bash
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: trantorHub
         path: artifacts/
