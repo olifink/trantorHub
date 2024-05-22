@@ -1,3 +1,5 @@
+[![Go Release, Build for All Platforms](https://github.com/olifink/trantorHub/actions/workflows/release.yml/badge.svg)](https://github.com/olifink/trantorHub/actions/workflows/release.yml)
+
 # TrantorHub Gateway
 
 TrantorHub is a local API Gateway with token-based authentication, file-based user management and direct Http forwarding written with Golang and Gin.
@@ -19,7 +21,8 @@ We've deliberately kept it simple - start the `trantorHub` without command-line 
 
 ```
 ./trantorHub
-
+```
+```
 Server Port: 8080
 Target URL: http://localhost:3000/
 Proxy Path: /proxy
