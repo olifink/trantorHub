@@ -52,7 +52,7 @@ func proxyHandler(c *gin.Context) {
 	// forward pseudonoimzied identity header for use in downstream system
 	username := c.GetString("username")
 	if username != "" {
-		c.Header("X-Trantor-Identity", anonymize(username))
+		c.Header("X-Trantor-Identity", createHash(username))
 	}
 
 	// Forward the status code and response body

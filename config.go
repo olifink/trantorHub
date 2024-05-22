@@ -37,7 +37,7 @@ var config = struct {
 	NoCacheHeaders: true,
 	AllowPublicGet: false,
 	AllowCors:      true,
-	AllowWebLogin:  true,
+	AllowWebLogin:  false,
 }
 
 // parseFlags parses command line flags and updates the `config` variable accordingly.
@@ -45,8 +45,10 @@ func parseFlags() {
 	flag.StringVar(&config.configFile, "config", "config.json", "Configuration file")
 	flag.StringVar(&config.UserFile, "users", "", "File with list of users and passwords, empty creates an 'example' user")
 	flag.IntVar(&config.ServerPort, "port", 8080, "Port for server")
-	flag.StringVar(&config.Target, "target", "http://example.com/", "Target URL for proxying requests")
+	flag.StringVar(&config.ProxyPath, "path", "/proxy", "Path name for proxy server")
+	flag.StringVar(&config.Target, "target", "http://localhost:3000/", "Target URL for proxying requests")
 	flag.BoolVar(&config.Release, "release", false, "Enable release mode")
+	flag.BoolVar(&config.AllowWebLogin, "web", false, "Allow web login")
 	flag.Parse()
 }
 
