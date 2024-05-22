@@ -20,32 +20,32 @@ jobs:
   
     - name: Build for Linux (Intel)
       run: |
-        GOOS=linux GOARCH=amd64 go build -v .
+        GOOS=linux GOARCH=amd64 go build -o trantorHub-linux-x86 -v .
       shell: bash
 
     - name: Build for Linux (ARM)
       run: |
-        GOOS=linux GOARCH=arm go build -v .
+        GOOS=linux GOARCH=arm go build -o trantorHub-linux-arm -v .
       shell: bash
 
     - name: Build for macOS (Intel)
       run: |
-        GOOS=darwin GOARCH=amd64 go build -v .
+        GOOS=darwin GOARCH=amd64 go build -o trantorHub-macos-x86 -v .
       shell: bash
 
     - name: Build for macOS (ARM)
       run: |
-        GOOS=darwin GOARCH=arm64 go build -v .
+        GOOS=darwin GOARCH=arm64 go build -o trantorHub-macos-arm -v .
       shell: bash
 
     - name: Build for Windows (Intel)
       run: |
-        GOOS=windows GOARCH=amd64 go build -v .
+        GOOS=windows GOARCH=amd64 go build -o trantorHub-win-x86 -v .
       shell: bash
 
     - name: Build for Windows (ARM)
       run: |
-        GOOS=windows GOARCH=arm go build -v .
+        GOOS=windows GOARCH=arm go build -o trantorHub-win-arm -v .
       shell: bash
 
     - name: Prepare artifacts
