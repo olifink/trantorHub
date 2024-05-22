@@ -28,11 +28,11 @@
 ## Mid-term - ideas before 1.0
 
 * [ ] Role for users and downstream identity
-* [ ] Web frontend support
+* [ ] Web frontend support (manage users)
 * [ ] Audience from origin and origin validation
-* [ ] Custom root redirect config
+* [ ] Custom root redirect config (double ports)
 * [ ] CLI options to add user to users file with bcrypt password hashes
-* [ ] Register new user hander (and write back file)
+* [ ] Register new user handler (and write back file)
 * [ ] Static file serving 
 * [ ] Markdown processing for static files (documentation portal)
 * [ ] Default embedded login/error forms
