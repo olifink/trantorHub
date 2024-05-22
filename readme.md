@@ -76,7 +76,7 @@ HTTP/1.1 200 OK
 Manage your own users by providing a text file to the `-users` option in the format
 
 ```
-<username>    <bcypted password>
+<username>    <bcrypted password>
 ```
 
 ### Downstream identity
