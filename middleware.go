@@ -13,6 +13,7 @@ func authenticateRequest(c *gin.Context) {
 	// see if public GET is allowed
 	if config.AllowPublicGet && c.Request.Method == "GET" {
 		c.Next()
+		return
 	}
 
 	// Check the authorization header
