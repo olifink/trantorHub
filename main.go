@@ -13,10 +13,10 @@ func runServer() {
 	}
 
 	r := gin.Default()
+	//if config.AllowCors {
+	//	r.Use(corsMiddleware())
+	//}
 
-	if config.AllowCors {
-		r.Use(corsMiddleware())
-	}
 	if config.NoCacheHeaders {
 		r.Use(nocacheMiddleware)
 	}

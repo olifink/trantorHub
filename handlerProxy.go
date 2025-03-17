@@ -10,7 +10,8 @@ import (
 func proxyHandler(c *gin.Context) {
 	// Determine the target URL (modify as needed)
 	targetURL := config.targetUrl
-	targetURL.Path = c.Param("path")
+	log.Println("Target URL", targetURL.Path)
+	targetURL.Path = targetURL.Path + c.Param("path")
 
 	log.Println("Proxying to", targetURL.String())
 
@@ -24,6 +25,15 @@ func proxyHandler(c *gin.Context) {
 	// Copy headers (optional, choose which headers to forward)
 	for key, value := range c.Request.Header {
 		proxyReq.Header[key] = value
+	}
+
+	// Don't forward Authorization header directly
+	proxyReq.Header.Del("Authorization")
+
+	// forward pseudonoimzied identity header for use in downstream system
+	username := c.GetString("username")
+	if username != "" {
+		c.Header("X-Trantor-Identity", createHash(username))
 	}
 
 	// Create a client and send the request
@@ -47,12 +57,6 @@ func proxyHandler(c *gin.Context) {
 		for _, value := range values {
 			c.Writer.Header().Add(key, value)
 		}
-	}
-
-	// forward pseudonoimzied identity header for use in downstream system
-	username := c.GetString("username")
-	if username != "" {
-		c.Header("X-Trantor-Identity", createHash(username))
 	}
 
 	// Forward the status code and response body

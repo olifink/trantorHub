@@ -2,7 +2,9 @@
   "serverPort": 8080,
   "jwtSecret": "xyz_secret_key",
   "jwtIssuer": "xyz-hub",
-  "proxyPath": "/proxy",
-  "target": "http://192.168.188.117:8080",
-  "allowPublicGet": true
+  "proxyPath": "/hub",
+  "publicPath": "/hub/static",
+  "target": "http://localhost:8008/hub",
+  "allowPublicGet": false,
+  "releaseMode": true
 }

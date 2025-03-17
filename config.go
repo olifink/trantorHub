@@ -22,6 +22,7 @@ var config = struct {
 	Issuer         string        `json:"jwtIssuer"`
 	Expire         string        `json:"jwtExpire"`
 	ProxyPath      string        `json:"proxyPath"`
+	PublicPath     string        `json:"publicPath"`
 	Target         string        `json:"target"`
 	NoCacheHeaders bool          `json:"noCacheHeaders"`
 	AllowPublicGet bool          `json:"allowPublicGet"`
@@ -36,7 +37,7 @@ var config = struct {
 	ProxyPath:      "/proxy",
 	NoCacheHeaders: true,
 	AllowPublicGet: false,
-	AllowCors:      true,
+	AllowCors:      false,
 	AllowWebLogin:  false,
 }
 
@@ -99,6 +100,7 @@ func readConfig() {
 	log.Println("Server Port:", config.ServerPort)
 	log.Println("Target URL:", config.targetUrl.String())
 	log.Println("Proxy Path:", config.ProxyPath)
+	log.Println("Public Path:", config.PublicPath)
 	if config.expireDuration.Seconds() > 0 {
 		log.Println("JWT Expire:", config.expireDuration.String())
 	} else {
@@ -106,4 +108,5 @@ func readConfig() {
 	}
 	log.Println("JWT Secret:", anonymize(config.Secret))
 	log.Println("JWT Issuer:", config.Issuer)
+	log.Println("Allow CORS:", config.AllowCors)
 }
