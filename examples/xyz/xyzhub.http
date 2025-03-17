@@ -24,3 +24,13 @@ GET http://192.168.188.117:8080/hub/static/openapi/stable.yaml
 
 GET http://localhost:8080/proxy/hub/static/openapi/stable.yaml
 Origin: http://localhost:8585
+
+
+###
+POST http://localhost:8080/token
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "secret"
+}

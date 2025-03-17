@@ -79,7 +79,14 @@ HTTP/1.1 200 OK
 Manage your own users by providing a text file to the `-users` option in the format
 
 ```
-<username>    <bcrypted password>
+<username>:<bcrypted password>
+```
+
+This is the format Apache httpd uses for managing simple user auth, 
+so it can be created with `htpasswd` using bcrypt:
+
+```
+htpasswd -n -B username
 ```
 
 ### Downstream identity

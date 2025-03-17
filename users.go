@@ -31,7 +31,7 @@ func GetUserByUsername(username string) *User {
 
 func readUsers() {
 	// default data is example/password
-	csvUsers := `example "$2a$14$HNOQGnDpfyF/95TT6VToEuyS4NCYKXH1pVlcq9fx9JaC/zBW.cn0i"`
+	csvUsers := `example:$2a$14$HNOQGnDpfyF/95TT6VToEuyS4NCYKXH1pVlcq9fx9JaC/zBW.cn0i`
 
 	// use file if it was given
 	var data io.Reader
@@ -46,11 +46,11 @@ func readUsers() {
 		data = file
 	}
 
-	// parse file as 2 columns. space separated
+	// parse file as 2 columns. colon separated
 	r := csv.NewReader(data)
 	r.TrimLeadingSpace = true
 	r.FieldsPerRecord = 2
-	r.Comma = ' '
+	r.Comma = ':'
 
 	// read all entries into user array
 	records, err := r.ReadAll()
