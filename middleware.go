@@ -96,6 +96,10 @@ func authenticateUsingJWT(c *gin.Context, token string) {
 }
 
 func authMiddleware(c *gin.Context) {
+	if config.NoAuth {
+		c.Next()
+		return
+	}
 	authenticateRequest(c)
 }
 
@@ -103,4 +107,15 @@ func nocacheMiddleware(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1
 	c.Header("Pragma", "no-cache")                                   // HTTP 1.0
 	c.Header("Expires", "0")                                         // Proxies
+	c.Next()
+}
+
+func corsMiddleware(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", c.GetHeader("Origin"))
+	c.Header("Access-Control-Allow-Credentials", "true")
+	c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+	c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+	c.Header("Access-Control-Expose-Headers", "Content-Length")
+	c.Header("Access-Control-Max-Age", "3600")
+	c.Next()
 }

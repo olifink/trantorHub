@@ -25,6 +25,7 @@ var config = struct {
 	PublicPath     string        `json:"publicPath"`
 	Target         string        `json:"target"`
 	NoCacheHeaders bool          `json:"noCacheHeaders"`
+	NoAuth         bool          `json:"noAuth"`
 	AllowPublicGet bool          `json:"allowPublicGet"`
 	AllowCors      bool          `json:"allowCors"`
 	AllowWebLogin  bool          `json:"AllowWebLogin"`
@@ -36,6 +37,7 @@ var config = struct {
 	Expire:         "0s",
 	ProxyPath:      "/proxy",
 	NoCacheHeaders: true,
+	NoAuth:         false,
 	AllowPublicGet: false,
 	AllowCors:      false,
 	AllowWebLogin:  false,
